@@ -26,6 +26,9 @@ let playerName = null;
 let selectedChoice = null;
 let currentQuestionId = null;
 let cleanupListeners = [];
+let pollTimer = null;
+let lastQuestionSnapshot = null;
+let lastResultSnapshot = null;
 
 function showStep(step) {
   joinSection.classList.toggle("hidden", step !== "join");
@@ -47,6 +50,12 @@ async function ensureQuestionsLoaded() {
 function cleanup() {
   cleanupListeners.forEach((remove) => remove());
   cleanupListeners = [];
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+  lastQuestionSnapshot = null;
+  lastResultSnapshot = null;
 }
 
 function attachListeners() {
@@ -88,6 +97,29 @@ function attachListeners() {
       }
     })
   );
+
+  // Polling fallback to ensure updates also arrive when storage events are unreliable.
+  const poll = () => {
+    if (!gameId) return;
+    const questionRaw = localStorage.getItem(storageKeys.question(gameId));
+    if (questionRaw !== lastQuestionSnapshot) {
+      lastQuestionSnapshot = questionRaw;
+      const payload = parseJSON(questionRaw);
+      if (payload?.qid) {
+        showQuestion(payload.qid, payload);
+      }
+    }
+    const resultRaw = localStorage.getItem(storageKeys.result(gameId));
+    if (resultRaw !== lastResultSnapshot) {
+      lastResultSnapshot = resultRaw;
+      const resultPayload = parseJSON(resultRaw);
+      if (resultPayload?.qid) {
+        handleResult(resultPayload);
+      }
+    }
+  };
+  poll(); // immediate sync
+  pollTimer = window.setInterval(poll, 500);
 }
 
 async function showQuestion(qid, payload) {
