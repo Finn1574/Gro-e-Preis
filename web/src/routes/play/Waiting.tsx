@@ -1,13 +1,14 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRequirePlayer } from "../../hooks/usePlayerAuth";
-import { socket } from "../../lib/socket";
+import { ensureSocketConnected, socket } from "../../lib/socket";
 
 const PlayerWaiting = () => {
   const navigate = useNavigate();
   const { loading } = useRequirePlayer();
 
   useEffect(() => {
+    ensureSocketConnected();
     const handleQuestion = ({ qid }: { qid: string }) => {
       navigate(`/play/question/${qid}`);
     };

@@ -1,0 +1,100 @@
+q001|100|Welche Farbe hat die Flagge Deutschlands?|Schwarz-Rot-Gold|Blau-Weiß|Rot-Weiß|Grün-Gelb|A
+q002|200|Wie viele Kontinente gibt es auf der Erde?|Fünf|Sechs|Sieben|Acht|C
+q003|300|Welcher Planet ist der Sonne am nächsten?|Mars|Venus|Merkur|Jupiter|C
+q004|400|Wie viele Tage hat ein Schaltjahr?|365|366|367|368|B
+q005|500|In welcher Stadt steht der Eiffelturm?|Berlin|Paris|Rom|Madrid|B
+q006|100|Wie heißt die Hauptstadt von Italien?|Madrid|Rom|Neapel|Mailand|B
+q007|200|Welches Tier ist das größte an Land lebende Säugetier?|Elefant|Giraffe|Nashorn|Nilpferd|A
+q008|300|Wie viele Spieler hat eine Fußballmannschaft auf dem Feld?|9|10|11|12|C
+q009|400|Welches chemische Symbol hat Wasserstoff?|H|O|N|He|A
+q010|500|Wie viele Bundesländer hat Deutschland?|14|15|16|17|C
+q011|100|Wer schrieb die Oper Die Zauberflöte?|Mozart|Beethoven|Bach|Haydn|A
+q012|200|Wie viele Minuten hat eine Stunde?|30|45|50|60|D
+q013|300|Was ist die Hauptstadt von Spanien?|Barcelona|Madrid|Valencia|Sevilla|B
+q014|400|Welche Einheit misst elektrische Stromstärke?|Volt|Ampere|Ohm|Watt|B
+q015|500|Welches Element hat die Ordnungszahl 1?|Helium|Wasserstoff|Lithium|Sauerstoff|B
+q016|100|Welcher Fluss fließt durch Wien?|Donau|Rhein|Elbe|Themse|A
+q017|200|Wer malte die Mona Lisa?|Van Gogh|Picasso|Da Vinci|Rembrandt|C
+q018|300|Wie viele Ecken hat ein Quadrat?|3|4|5|6|B
+q019|400|Welcher Planet ist für seine Ringe bekannt?|Mars|Saturn|Uranus|Neptun|B
+q020|500|Wie viele Chromosomen hat der Mensch?|22|44|46|48|C
+q021|100|Welche Farbe entsteht aus Gelb und Blau?|Rot|Orange|Grün|Lila|C
+q022|200|Welches Meer liegt zwischen Afrika und Europa?|Mittelmeer|Schwarzes Meer|Rotes Meer|Nordsee|A
+q023|300|Wie heißt die Hauptstadt von Österreich?|Wien|Graz|Salzburg|Innsbruck|A
+q024|400|Welches Gas atmen Menschen hauptsächlich ein?|Kohlendioxid|Sauerstoff|Stickstoff|Wasserstoff|C
+q025|500|Wie viele Spieler sind bei einem Volleyballteam auf dem Feld?|4|5|6|7|C
+q026|100|Wer erfand den Buchdruck mit beweglichen Lettern in Europa?|Galilei|Gutenberg|Newton|Faraday|B
+q027|200|Wie nennt man den Wechsel von flüssig zu gasförmig?|Kondensation|Verdunstung|Erstarrung|Sublimation|B
+q028|300|Welches Tier liefert Wolle?|Schaf|Kuh|Schwein|Pferd|A
+q029|400|Wie viele Planeten hat unser Sonnensystem?|7|8|9|10|B
+q030|500|Welches Land ist flächenmäßig am größten?|Kanada|USA|Russland|China|C
+q031|100|Was ist die größte Stadt Deutschlands nach Einwohnern?|München|Berlin|Hamburg|Köln|B
+q032|200|Welcher Komponist wurde taub?|Mozart|Beethoven|Schubert|Chopin|B
+q033|300|Welche Sportart spielt man mit einem Schläger und einem kleinen weißen Ball auf einem grünen Platz?|Tennis|Badminton|Baseball|Golf|D
+q034|400|Wie heißt der Prozess, bei dem Pflanzen Sonnenlicht in Energie umwandeln?|Respiration|Fermentation|Fotosynthese|Osmose|C
+q035|500|Welche Stadt liegt an der Themse?|Paris|London|Dublin|Edinburgh|B
+q036|100|Wie viele Sterne hat die Flagge der Europäischen Union?|10|11|12|13|C
+q037|200|Wie nennt man drei aufeinanderfolgende Noten in der Musik?|Trio|Triolett|Triplet|Triade|D
+q038|300|Welches Metall wird hauptsächlich für Elektrodrähte verwendet?|Eisen|Kupfer|Aluminium|Zink|B
+q039|400|Welcher Kontinent ist der größte?|Afrika|Asien|Amerika|Europa|B
+q040|500|Wer schrieb das Stück Faust?|Schiller|Lessing|Goethe|Kleist|C
+q041|100|Wie viele Monate hat ein Jahr?|10|11|12|13|C
+q042|200|Welche Währung hat die Schweiz?|Euro|Dollar|Franken|Pfund|C
+q043|300|Welches Organ pumpt Blut durch den Körper?|Herz|Lunge|Leber|Niere|A
+q044|400|Wie heißt der längste Fluss Deutschlands?|Rhein|Donau|Elbe|Weser|A
+q045|500|Welche Programmiersprache wird oft für Webentwicklung genutzt?|Python|Java|JavaScript|C|C
+q046|100|Welche Form hat ein Fußballfeld?|Kreis|Rechteck|Quadrat|Oval|B
+q047|200|Wie viele Flügel hat eine Biene?|Zwei|Vier|Sechs|Acht|B
+q048|300|Welcher Planet wird als roter Planet bezeichnet?|Mars|Jupiter|Saturn|Pluto|A
+q049|400|Wie viele Bundeskanzler hatte Deutschland bis 2021?|6|7|8|9|C
+q050|500|Welche Stadt ist die Hauptstadt von Kanada?|Toronto|Vancouver|Ottawa|Montreal|C
+q051|100|Welche Farbe ergibt sich aus Rot und Blau?|Orange|Grün|Lila|Gelb|C
+q052|200|Wie viele Millimeter sind in einem Meter?|100|500|1000|2000|C
+q053|300|Welcher Planet hat den größten Sturm, den sogenannten Großen Roten Fleck?|Mars|Saturn|Jupiter|Neptun|C
+q054|400|Wie viele Seiten hat ein Hexagon?|5|6|7|8|B
+q055|500|Wer entdeckte die Relativitätstheorie?|Einstein|Newton|Planck|Bohr|A
+q056|100|Welches Element hat das Symbol O?|Gold|Silber|Sauerstoff|Blei|C
+q057|200|Wie viele Knochen hat ein erwachsener Mensch ungefähr?|100|156|206|250|C
+q058|300|Wie heißt die Hauptstadt von Frankreich?|Paris|Lyon|Marseille|Nizza|A
+q059|400|Welches Tier ist das schnellste an Land?|Gepard|Falke|Antilope|Puma|A
+q060|500|Wie viele Jahre dauern die Olympischen Sommerzyklen?|2|4|6|8|B
+q061|100|Was ist der höchste Berg der Welt?|K2|Mont Blanc|Mount Everest|Kilimandscharo|C
+q062|200|Welche Farbe hat Chlorophyll?|Rot|Blau|Grün|Gelb|C
+q063|300|Wie viele Zeitzonen hat Russland?|7|9|11|13|C
+q064|400|Welches Land hat die größte Bevölkerung?|USA|China|Indien|Indonesien|B
+q065|500|Welche Sprache hat weltweit die meisten Muttersprachler?|Englisch|Spanisch|Mandarin|Hindi|C
+q066|100|Welche Stadt ist die Hauptstadt von Japan?|Osaka|Kyoto|Tokio|Nagoya|C
+q067|200|Wie viele Ringe hat das Olympische Symbol?|4|5|6|7|B
+q068|300|Welcher Planet hat die meisten Monde?|Jupiter|Saturn|Uranus|Neptun|A
+q069|400|Wie viele Spieler sind bei Basketball gleichzeitig auf dem Feld pro Team?|3|4|5|6|C
+q070|500|Welcher Schriftsteller schuf Sherlock Holmes?|Agatha Christie|Arthur Conan Doyle|Charles Dickens|Mark Twain|B
+q071|100|Welche Farbe hat die Banane, wenn sie reif ist?|Grün|Rot|Gelb|Blau|C
+q072|200|Wie heißt der größte Ozean?|Indischer Ozean|Atlantik|Pazifik|Arktischer Ozean|C
+q073|300|Welches Land liegt nicht in Europa?|Portugal|Tschechien|Brasilien|Norwegen|C
+q074|400|Wie viele Atemzüge macht ein Erwachsener durchschnittlich pro Minute?|5-10|12-20|25-30|35-40|B
+q075|500|Welche Stadt wird als ewige Stadt bezeichnet?|Athen|Rom|Jerusalem|Istanbul|B
+q076|100|Welche Jahreszeit folgt auf den Frühling?|Sommer|Herbst|Winter|Frühling|A
+q077|200|Wie viele Buchstaben hat das deutsche Alphabet (ohne Umlaute)?|24|25|26|27|C
+q078|300|Welcher Planet ist der größte im Sonnensystem?|Saturn|Uranus|Jupiter|Neptun|C
+q079|400|Welche Wissenschaft beschäftigt sich mit Sternen?|Geologie|Biologie|Astronomie|Chemie|C
+q080|500|Wie viele Länder gehören zur EU (Stand 2021)?|25|26|27|28|C
+q081|100|Wie viele Stunden hat ein Tag?|12|24|36|48|B
+q082|200|Welche Sportart spielt man auf Eis mit einem Schläger und Puck?|Eishockey|Curling|Eisstock|Snowboard|A
+q083|300|Wie viele Beine hat eine Spinne?|6|8|10|12|B
+q084|400|Welches Instrument hat Tasten, Saiten und Hämmer?|Gitarre|Harfe|Klavier|Orgel|C
+q085|500|Wer schrieb die Sinfonie Nr. 9 d-Moll?|Mozart|Beethoven|Brahms|Mahler|B
+q086|100|Welche Farbe hat der Himmel an einem klaren Tag?|Grün|Blau|Rot|Gelb|B
+q087|200|Wie viele Zähne hat ein Erwachsener normalerweise?|28|30|32|34|C
+q088|300|Welches ist das größte Organ im menschlichen Körper?|Herz|Leber|Haut|Gehirn|C
+q089|400|Wie viele Milliliter sind in einem Liter?|500|750|1000|1200|C
+q090|500|Welcher Wissenschaftler entdeckte die Schwerkraft nach Legende durch einen Apfel?|Einstein|Newton|Galilei|Kepler|B
+q091|100|Wie viele Kontinente sind vollständig auf der Nordhalbkugel?|2|3|4|5|C
+q092|200|Wie viele Wochen hat ein Jahr?|48|50|52|54|C
+q093|300|Welcher Fluss ist der längste der Welt?|Nil|Amazonas|Jangtse|Mississippi|B
+q094|400|Wie nennt man einen Winkel mit 90 Grad?|Spitzwinkel|Rechter Winkel|Stumpfer Winkel|Falscher Winkel|B
+q095|500|Welche Stadt ist Sitz der EU-Kommission?|Brüssel|Straßburg|Luxemburg|Paris|A
+q096|100|Wie viele Tage hat der Monat Februar in Nicht-Schaltjahren?|27|28|29|30|B
+q097|200|Welches Tier kann fliegen?|Pinguin|Fledermaus|Strauß|Känguru|B
+q098|300|Wie heißt die größte Wüste der Erde?|Sahara|Gobi|Arabische Wüste|Kalahari|A
+q099|400|Welche Stadt liegt an der Spree?|Hamburg|Berlin|Frankfurt|Stuttgart|B
+q100|500|Wer war der erste Mensch auf dem Mond?|Yuri Gagarin|Buzz Aldrin|Neil Armstrong|Michael Collins|C

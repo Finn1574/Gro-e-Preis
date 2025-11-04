@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRequirePlayer } from "../../hooks/usePlayerAuth";
 import { apiFetch } from "../../lib/api";
-import { socket } from "../../lib/socket";
+import { ensureSocketConnected, socket } from "../../lib/socket";
 
 type AnswerLetter = "A" | "B" | "C" | "D";
 
@@ -16,7 +16,7 @@ interface PlayerQuestionPayload {
 const PlayerQuestion = () => {
   const { qid } = useParams<{ qid: string }>();
   const navigate = useNavigate();
-  const loading = useRequirePlayer();
+  const { loading, session } = useRequirePlayer();
   const [question, setQuestion] = useState<PlayerQuestionPayload | null>(null);
   const [choice, setChoice] = useState<AnswerLetter | "">("");
   const [status, setStatus] = useState<string | null>(null);
@@ -27,6 +27,7 @@ const PlayerQuestion = () => {
       navigate("/play/waiting", { replace: true });
       return;
     }
+    ensureSocketConnected();
     apiFetch<PlayerQuestionPayload>(`/api/player/question/${qid}`)
       .then((data) => {
         setQuestion(data);
@@ -65,6 +66,11 @@ const PlayerQuestion = () => {
       setStatus("Pick an answer before submitting.");
       return;
     }
+    if (!session?.gameId) {
+      setStatus("Lost game session. Return to the lobby.");
+      setTimeout(() => navigate("/play/join"), 1500);
+      return;
+    }
     if (locked) {
       return;
     }
@@ -72,7 +78,7 @@ const PlayerQuestion = () => {
     setStatus("Answer submitted. Waiting for result…");
     socket.emit(
       "player:answer",
-      { gameId: question.qid.split("-")[0] ?? "", qid, choice },
+      { gameId: session.gameId, qid, choice },
       (response: { ok: boolean; error?: string }) => {
         if (!response?.ok) {
           setStatus(response?.error || "Submission failed");

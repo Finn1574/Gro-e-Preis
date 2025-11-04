@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
 interface HostGameState {
   gameId?: string;
@@ -7,11 +7,7 @@ interface HostGameState {
 
 const HostGameContext = createContext<HostGameState | undefined>(undefined);
 
-interface HostGameProviderProps {
-  children: React.ReactNode;
-}
-
-export const HostGameProvider: React.FC<HostGameProviderProps> = ({ children }) => {
+export const HostGameProvider = ({ children }: { children: ReactNode }) => {
   const [gameId, setGameIdState] = useState<string | undefined>(() => {
     return sessionStorage.getItem("hostGameId") || undefined;
   });
