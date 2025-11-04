@@ -55,16 +55,18 @@ function attachListeners() {
 
   cleanupListeners.push(
     listenStorage(storageKeys.question(gameId), (event) => {
-      const payload = parseJSON(event.newValue);
+      const raw = event.newValue ?? localStorage.getItem(storageKeys.question(gameId));
+      const payload = parseJSON(raw);
       if (payload?.qid) {
-        showQuestion(payload.qid);
+        showQuestion(payload.qid, payload);
       }
     })
   );
 
   cleanupListeners.push(
     listenStorage(storageKeys.result(gameId), (event) => {
-      const payload = parseJSON(event.newValue);
+      const raw = event.newValue ?? localStorage.getItem(storageKeys.result(gameId));
+      const payload = parseJSON(raw);
       if (payload?.qid) {
         handleResult(payload);
       }
@@ -81,14 +83,14 @@ function attachListeners() {
         setStatus(joinStatus, "Host hat das Spiel gestartet. Warte auf die Frage.");
         const current = parseJSON(localStorage.getItem(storageKeys.question(gameId)));
         if (current?.qid) {
-          showQuestion(current.qid);
+          showQuestion(current.qid, current);
         }
       }
     })
   );
 }
 
-async function showQuestion(qid) {
+async function showQuestion(qid, payload) {
   await ensureQuestionsLoaded();
   const question = questionsById.get(qid);
   if (!question) return;
@@ -97,7 +99,12 @@ async function showQuestion(qid) {
   selectedChoice = null;
   questionTitle.textContent = question.prompt;
   questionPoints.textContent = `${question.points} Punkte`;
-  questionText.textContent = "Wähle deine Antwort.";
+  if (payload?.askedAt) {
+    const seconds = Math.max(0, Math.floor((Date.now() - payload.askedAt) / 1000));
+    questionText.textContent = `Wähle deine Antwort (Frage gestartet vor ${seconds} Sek.).`;
+  } else {
+    questionText.textContent = "Wähle deine Antwort.";
+  }
   questionOptions.innerHTML = "";
   Object.entries(question.options).forEach(([key, value]) => {
     const button = document.createElement("button");
@@ -164,7 +171,7 @@ joinButton.addEventListener("click", async () => {
   attachListeners();
   const current = parseJSON(localStorage.getItem(storageKeys.question(gameId)));
   if (current?.qid) {
-    showQuestion(current.qid);
+    showQuestion(current.qid, current);
   }
 });
 
@@ -212,6 +219,6 @@ submitAnswerButton.addEventListener("click", () => {
   attachListeners();
   const current = parseJSON(localStorage.getItem(storageKeys.question(gameId)));
   if (current?.qid) {
-    showQuestion(current.qid);
+    showQuestion(current.qid, current);
   }
 })();
