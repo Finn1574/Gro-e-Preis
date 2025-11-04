@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Der Große Preis — Übersicht</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: radial-gradient(circle at top, #1a2238, #06070f 65%);
+        color: #f6f8ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: clamp(1.5rem, 3vw, 4rem);
+      }
+
+      main {
+        width: min(960px, 100%);
+        display: grid;
+        gap: 2rem;
+        padding: clamp(1.5rem, 3vw, 3rem);
+        border-radius: 32px;
+        background: rgba(15, 20, 35, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 2.75rem);
+      }
+
+      p {
+        margin: 0;
+        color: rgba(246, 248, 255, 0.75);
+        line-height: 1.6;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.9rem 2.4rem;
+        border-radius: 999px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+      }
+
+      a[href^="https"] {
+        background: linear-gradient(135deg, #5ec9ff, #2b8fff);
+        color: #04121d;
+      }
+
+      a[href^="./"] {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #f6f8ff;
+        background: transparent;
+      }
+
+      a:hover,
+      a:focus-visible {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 45px rgba(88, 180, 255, 0.35);
+      }
+
+      footer {
+        display: grid;
+        gap: 0.6rem;
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Der Große Preis</h1>
+        <p>
+          Willkommen! Dieses Projekt besteht aus einem React-Frontend und einem Node.js-Backend. Die GitHub Pages
+          Vorschau zeigt lediglich diese statische Übersicht. Um das vollständige Quiz mit Host- und Player-Flows zu
+          nutzen, starte die Anwendung lokal.
+        </p>
+      </header>
+      <section class="actions">
+        <a href="README.md">Zur Dokumentation</a>
+        <a href="https://github.com/Finn1574/Gro-e-Preis">Repository ansehen</a>
+      </section>
+      <footer>
+        <p>
+          Lokale Entwicklung: <code>npm install</code>, anschließend in getrennten Terminals
+          <code>npm run dev:server</code> und <code>npm run dev:web</code>.
+        </p>
+        <p>Die React-App findest du im Ordner <code>/web</code>, den Express-Server im Ordner <code>/server</code>.</p>
+      </footer>
+    </main>
+  </body>
+</html>
