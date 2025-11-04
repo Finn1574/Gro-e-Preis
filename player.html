@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Player Lobby</title>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <main class="page page--player">
+      <header class="page__header">
+        <h1>Der Große Preis — Player Console</h1>
+        <p>Enter the session code from the host, then use your device to buzz in and lock your answer.</p>
+      </header>
+      <section class="page__content page__content--player">
+        <article class="card join-card">
+          <h2 class="join-card__title">Join the lobby</h2>
+          <form class="form join-form" data-join-form>
+            <label class="form__label" for="player-name">Display name</label>
+            <input class="form__input" id="player-name" name="player-name" type="text" placeholder="z. B. Team Blau" required />
+            <label class="form__label" for="player-code">Session code</label>
+            <input class="form__input" id="player-code" name="player-code" type="text" inputmode="numeric" pattern="\d{4}" placeholder="XXXX" maxlength="4" required />
+            <button class="button form__submit" type="submit">Connect</button>
+          </form>
+          <p class="join-card__status" data-join-status>Waiting to connect...</p>
+        </article>
+
+        <section class="card controls-card controls-card--disabled" data-controls>
+          <header class="controls-card__header">
+            <h2>Answer controls</h2>
+            <p>Buzz in first to claim the question, then lock in your choice.</p>
+          </header>
+          <button class="buzzer" type="button" data-buzzer disabled>Buzz In!</button>
+          <div class="answer-grid">
+            <button class="answer-button" type="button" data-answer="A" disabled>A</button>
+            <button class="answer-button" type="button" data-answer="B" disabled>B</button>
+            <button class="answer-button" type="button" data-answer="C" disabled>C</button>
+            <button class="answer-button" type="button" data-answer="D" disabled>D</button>
+          </div>
+          <button class="button button--secondary controls-card__reset" type="button" data-reset disabled>Reset choice</button>
+          <p class="controls-card__feedback" data-feedback>Connect to activate the controls.</p>
+        </section>
+
+        <section class="card tips-card">
+          <h2>Fair play reminders</h2>
+          <ul>
+            <li>Only buzz when you are ready to answer the current question.</li>
+            <li>Once you lock a choice, let the host confirm before changing it.</li>
+            <li>Keep the device nearby — the host sees who buzzed first.</li>
+          </ul>
+        </section>
+      </section>
+      <a class="link-back" href="index.html">Back to lobby</a>
+    </main>
+    <script src="scripts/player.js" defer></script>
+  </body>
+</html>
