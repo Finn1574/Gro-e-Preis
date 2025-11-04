@@ -139,6 +139,16 @@ joinButton.addEventListener("click", async () => {
     setStatus(joinStatus, "Bitte Name und Spiel-ID eingeben.", true);
     return;
   }
+  setStatus(joinStatus, "Verbinde...", false);
+  const active = localStorage.getItem(storageKeys.activeGame);
+  if (active && active !== id) {
+    setStatus(
+      joinStatus,
+      "Dieses Spiel läuft in einem anderen Browser. Diese Demo benötigt Host und Player im selben Browser.",
+      true
+    );
+    return;
+  }
   playerName = name;
   gameId = id;
   sessionStorage.setItem("dgp-player", JSON.stringify({ playerName, gameId }));
