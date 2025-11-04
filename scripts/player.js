@@ -77,6 +77,12 @@ function attachListeners() {
         setStatus(joinStatus, "Spiel wurde beendet.");
         showStep("join");
         cleanup();
+      } else if (!event.oldValue && event.newValue) {
+        setStatus(joinStatus, "Host hat das Spiel gestartet. Warte auf die Frage.");
+        const current = parseJSON(localStorage.getItem(storageKeys.question(gameId)));
+        if (current?.qid) {
+          showQuestion(current.qid);
+        }
       }
     })
   );
@@ -133,18 +139,18 @@ joinButton.addEventListener("click", async () => {
     setStatus(joinStatus, "Bitte Name und Spiel-ID eingeben.", true);
     return;
   }
-  const state = localStorage.getItem(storageKeys.game(id));
-  if (!state) {
-    setStatus(joinStatus, "Spiel nicht gefunden.", true);
-    return;
-  }
   playerName = name;
   gameId = id;
   sessionStorage.setItem("dgp-player", JSON.stringify({ playerName, gameId }));
   activeGameLabel.textContent = gameId;
   activePlayerLabel.textContent = playerName;
   showStep("waiting");
-  setStatus(joinStatus, "Verbunden. Warte auf die erste Frage.");
+  const state = parseJSON(localStorage.getItem(storageKeys.game(id)));
+  if (state) {
+    setStatus(joinStatus, "Verbunden. Warte auf die erste Frage.");
+  } else {
+    setStatus(joinStatus, "Verbunden. Warte bis der Host das Spiel startet.");
+  }
   attachListeners();
   const current = parseJSON(localStorage.getItem(storageKeys.question(gameId)));
   if (current?.qid) {
