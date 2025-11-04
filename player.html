@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Der Große Preis – Player</title>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body class="page page--player">
+    <header class="page__header">
+      <h1>Der Große Preis — Player Console</h1>
+      <p>Tritt einem Spiel bei, warte auf Fragen und sende deine Antwort.</p>
+    </header>
+
+    <section class="card player-card" data-step="join">
+      <h2>Spiel beitreten</h2>
+      <label class="form-control">
+        <span>Dein Name</span>
+        <input type="text" data-player-name placeholder="Team Blau" />
+      </label>
+      <label class="form-control">
+        <span>Spiel-ID</span>
+        <input type="text" data-player-game placeholder="z. B. ABC123" />
+      </label>
+      <button class="button" data-join>Beitreten</button>
+      <p class="hint" data-join-status></p>
+    </section>
+
+    <section class="card player-card hidden" data-step="waiting">
+      <h2>Warte auf die nächste Frage…</h2>
+      <p>Bleib auf dieser Seite. Sobald der Host eine Frage auswählt, erscheint sie automatisch.</p>
+      <p>Verbunden mit Spiel <strong data-active-game></strong> als <strong data-active-player></strong>.</p>
+    </section>
+
+    <section class="card player-card hidden" data-step="question">
+      <header>
+        <h2 data-question-title></h2>
+        <p class="question__points" data-question-points></p>
+      </header>
+      <p data-question-text></p>
+      <div class="question__options" data-question-options></div>
+      <button class="button" data-submit-answer>Antwort senden</button>
+      <p class="hint" data-question-status></p>
+    </section>
+
+    <script src="scripts/common.js" type="module"></script>
+    <script src="scripts/player.js" type="module"></script>
+  </body>
+</html>

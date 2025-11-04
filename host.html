@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Der Große Preis – Host</title>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body class="page page--host">
+    <header class="page__header">
+      <h1>Der Große Preis — Host Console</h1>
+      <p>Steuere das Quiz, starte Runden und verfolge Antworten in Echtzeit (innerhalb desselben Browsers).</p>
+    </header>
+
+    <section class="host host--login" data-step="login">
+      <h2>Host Login</h2>
+      <p>Schütze den Host-Bereich mit dem Standard-Passwort <code>007</code>.</p>
+      <label class="form-control">
+        <span>Passwort</span>
+        <input type="password" data-password placeholder="•••" />
+      </label>
+      <button class="button" data-login>Login</button>
+      <p class="hint" data-login-hint></p>
+    </section>
+
+    <section class="host host--setup hidden" data-step="setup">
+      <h2>Spiel vorbereiten</h2>
+      <p>Erzeuge einen neuen Spielcode. Spieler können via QR-Code oder Link beitreten.</p>
+      <button class="button" data-create-game>Neues Spiel starten</button>
+      <div class="game-info hidden" data-game-info>
+        <p>Spiel-ID: <strong data-game-id></strong></p>
+        <p>Spiel-Link: <a data-game-link href="#" target="_blank" rel="noopener"></a></p>
+        <img data-qr alt="QR-Code zum Beitreten" />
+        <button class="button button--secondary" data-open-board>Weiter zum Spielfeld</button>
+      </div>
+    </section>
+
+    <section class="host host--board hidden" data-step="board">
+      <header class="host__subheader">
+        <div>
+          <p class="label">Aktives Spiel</p>
+          <strong data-board-game-id></strong>
+        </div>
+        <div>
+          <p class="label">Aktuelle Frage</p>
+          <span data-current-question>Keine</span>
+        </div>
+      </header>
+      <div class="board" data-board></div>
+      <div class="board__status" data-board-status></div>
+      <button class="button button--secondary" data-reset-board>Spiel beenden</button>
+    </section>
+
+    <div class="modal hidden" data-question-modal>
+      <div class="modal__content">
+        <button class="modal__close" data-close-modal>&times;</button>
+        <h2 data-modal-title></h2>
+        <p class="modal__points" data-modal-points></p>
+        <p data-modal-text></p>
+        <div class="modal__answers" data-modal-answers></div>
+        <div class="modal__actions">
+          <button class="button" data-mark-correct>Richtig</button>
+          <button class="button button--secondary" data-mark-wrong>Falsch</button>
+        </div>
+        <p class="modal__message" data-modal-message></p>
+      </div>
+    </div>
+
+    <script src="scripts/common.js" type="module"></script>
+    <script src="scripts/host.js" type="module"></script>
+  </body>
+</html>
