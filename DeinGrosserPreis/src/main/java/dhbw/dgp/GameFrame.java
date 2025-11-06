@@ -364,10 +364,14 @@ public class GameFrame extends JFrame {
     }
 
     private void showPlayerInfo() {
+        String joinLink = playerServer.getHostedJoinLink();
+        String hostedUi = playerServer.getHostedPlayerUiUrl();
+        String localEndpoint = playerServer.getLocalEndpointUrl();
         JOptionPane.showMessageDialog(
                 this,
-                "Spieler können unter http://localhost:" + playerServer.getPort() + "/ beitreten,\n"
-                        + "ihr Team auswählen und Antworten abgeben.",
+                "Spieler können unter " + joinLink + " beitreten und dort direkt teilnehmen.\n"
+                        + "Falls der Link nicht funktioniert, öffnet " + hostedUi + "\n"
+                        + "und tragt als Server-Adresse \"" + localEndpoint + "\" ein.",
                 "Spielerserver gestartet",
                 JOptionPane.INFORMATION_MESSAGE
         );

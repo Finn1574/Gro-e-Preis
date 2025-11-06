@@ -7,10 +7,17 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +30,8 @@ import java.util.function.Consumer;
  * Simple HTTP server that exposes a player UI and APIs for remote answering.
  */
 public class PlayerServer implements AutoCloseable {
+    private static final String REMOTE_PLAYER_UI_URL = "https://finn1574.github.io/Gro-e-Preis/";
+
     private final GameManager gameManager;
     private final Consumer<QuestionResult> resultConsumer;
     private final int port;
@@ -103,14 +112,34 @@ public class PlayerServer implements AutoCloseable {
     private final class RootHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                handlePreflight(exchange);
+                return;
+            }
             if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
                 sendPlainText(exchange, 405, "Method Not Allowed");
                 return;
             }
-            byte[] content = buildIndexHtml().getBytes(StandardCharsets.UTF_8);
+
+            if (shouldServeInlineUi(exchange)) {
+                byte[] content = buildIndexHtml().getBytes(StandardCharsets.UTF_8);
+                Headers headers = exchange.getResponseHeaders();
+                headers.set("Content-Type", "text/html; charset=utf-8");
+                applyCorsHeaders(headers);
+                exchange.sendResponseHeaders(200, content.length);
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(content);
+                }
+                return;
+            }
+
+            String redirectTarget = resolveRedirectTarget(exchange);
+            byte[] content = ("Die Spielerkonsole ist jetzt unter " + redirectTarget + " erreichbar.").getBytes(StandardCharsets.UTF_8);
             Headers headers = exchange.getResponseHeaders();
-            headers.add("Content-Type", "text/html; charset=utf-8");
-            exchange.sendResponseHeaders(200, content.length);
+            headers.set("Content-Type", "text/plain; charset=utf-8");
+            headers.set("Location", redirectTarget);
+            applyCorsHeaders(headers);
+            exchange.sendResponseHeaders(302, content.length);
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(content);
             }
@@ -120,6 +149,10 @@ public class PlayerServer implements AutoCloseable {
     private final class StateHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                handlePreflight(exchange);
+                return;
+            }
             if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
                 sendPlainText(exchange, 405, "Method Not Allowed");
                 return;
@@ -129,7 +162,8 @@ public class PlayerServer implements AutoCloseable {
             byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
 
             Headers headers = exchange.getResponseHeaders();
-            headers.add("Content-Type", "application/json; charset=utf-8");
+            headers.set("Content-Type", "application/json; charset=utf-8");
+            applyCorsHeaders(headers);
             exchange.sendResponseHeaders(200, bytes.length);
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(bytes);
@@ -140,6 +174,10 @@ public class PlayerServer implements AutoCloseable {
     private final class AnswerHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                handlePreflight(exchange);
+                return;
+            }
             if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
                 sendPlainText(exchange, 405, "Method Not Allowed");
                 return;
@@ -253,7 +291,9 @@ public class PlayerServer implements AutoCloseable {
 
     private void sendPlainText(HttpExchange exchange, int status, String message) throws IOException {
         byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "text/plain; charset=utf-8");
+        Headers headers = exchange.getResponseHeaders();
+        headers.set("Content-Type", "text/plain; charset=utf-8");
+        applyCorsHeaders(headers);
         exchange.sendResponseHeaders(status, bytes.length);
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
@@ -263,11 +303,110 @@ public class PlayerServer implements AutoCloseable {
     private void sendJson(HttpExchange exchange, ResponsePayload payload) throws IOException {
         String json = payload.toJson();
         byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json; charset=utf-8");
+        Headers headers = exchange.getResponseHeaders();
+        headers.set("Content-Type", "application/json; charset=utf-8");
+        applyCorsHeaders(headers);
         exchange.sendResponseHeaders(payload.statusCode(), bytes.length);
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
         }
+    }
+
+    private void applyCorsHeaders(Headers headers) {
+        if (headers == null) {
+            return;
+        }
+        headers.set("Access-Control-Allow-Origin", "*");
+        headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+        headers.set("Access-Control-Allow-Headers", "Content-Type");
+        headers.set("Access-Control-Max-Age", "86400");
+    }
+
+    private void handlePreflight(HttpExchange exchange) throws IOException {
+        applyCorsHeaders(exchange.getResponseHeaders());
+        exchange.sendResponseHeaders(204, -1);
+        exchange.close();
+    }
+
+    private boolean shouldServeInlineUi(HttpExchange exchange) {
+        String query = exchange.getRequestURI().getRawQuery();
+        if (query != null && query.contains("inline=1")) {
+            return true;
+        }
+        String hostHeader = exchange.getRequestHeaders().getFirst("Host");
+        return hostHeader == null
+                || hostHeader.startsWith("localhost")
+                || hostHeader.startsWith("127.0.0.1");
+    }
+
+    private String resolveRedirectTarget(HttpExchange exchange) {
+        String hostHeader = exchange.getRequestHeaders().getFirst("Host");
+        String baseUrl;
+        if (hostHeader == null || hostHeader.isBlank()) {
+            baseUrl = getLocalEndpointUrl();
+        } else if (hostHeader.contains("://")) {
+            baseUrl = hostHeader;
+        } else {
+            baseUrl = "http://" + hostHeader;
+        }
+        return buildHostedJoinLink(baseUrl);
+    }
+
+    public String getHostedPlayerUiUrl() {
+        return REMOTE_PLAYER_UI_URL;
+    }
+
+    public String getHostedJoinLink() {
+        return buildHostedJoinLink(getLocalEndpointUrl());
+    }
+
+    public String getLocalEndpointUrl() {
+        return "http://" + determineSuggestedHost() + ":" + port;
+    }
+
+    private String buildHostedJoinLink(String baseUrl) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            return REMOTE_PLAYER_UI_URL;
+        }
+        String encoded = URLEncoder.encode(baseUrl, StandardCharsets.UTF_8);
+        String separator = REMOTE_PLAYER_UI_URL.contains("?") ? "&" : "?";
+        return REMOTE_PLAYER_UI_URL + separator + "server=" + encoded;
+    }
+
+    private String determineSuggestedHost() {
+        try {
+            InetAddress localHost = InetAddress.getLocalHost();
+            if (isUsableAddress(localHost)) {
+                return localHost.getHostAddress();
+            }
+        } catch (UnknownHostException ignored) {
+        }
+
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                if (!networkInterface.isUp() || networkInterface.isLoopback() || networkInterface.isVirtual()) {
+                    continue;
+                }
+                Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress address = addresses.nextElement();
+                    if (isUsableAddress(address)) {
+                        return address.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException ignored) {
+        }
+
+        return "localhost";
+    }
+
+    private boolean isUsableAddress(InetAddress address) {
+        return address != null
+                && !address.isLoopbackAddress()
+                && address instanceof Inet4Address;
     }
 
     private Map<String, String> parseFormEncoded(String body) {
@@ -375,13 +514,13 @@ public class PlayerServer implements AutoCloseable {
                     <title>Der Große Preis – Spielerkonsole</title>
                     <style>
                         body { font-family: Arial, sans-serif; background: #0d47a1; color: #fff; margin: 0; padding: 0; }
-                        .container { max-width: 800px; margin: 0 auto; padding: 24px; }
+                        .container { max-width: 860px; margin: 0 auto; padding: 24px; }
                         h1 { text-align: center; margin-bottom: 16px; }
                         .card { background: rgba(255,255,255,0.1); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
                         label { display: block; margin-bottom: 6px; font-weight: bold; }
                         input[type="text"], select { width: 100%; padding: 10px; border-radius: 8px; border: none; font-size: 16px; }
                         input[disabled], select[disabled] { opacity: 0.6; cursor: not-allowed; }
-                        .input-row { display: flex; gap: 8px; }
+                        .input-row { display: flex; gap: 8px; flex-wrap: wrap; }
                         .input-row button { padding: 10px 16px; font-size: 16px; border: none; border-radius: 8px; background: #1976d2; color: #fff; cursor: pointer; }
                         .identity-card button:disabled { opacity: 0.6; cursor: not-allowed; }
                         .identity-banner { display: none; background: rgba(255,255,255,0.18); padding: 10px 16px; border-radius: 10px; font-weight: 600; margin-bottom: 12px; }
@@ -395,12 +534,28 @@ public class PlayerServer implements AutoCloseable {
                         .scoreboard { display: grid; gap: 8px; }
                         .scoreboard-item { background: rgba(255,255,255,0.08); padding: 10px; border-radius: 8px; }
                         .message { margin-top: 12px; font-weight: bold; min-height: 24px; }
+                        .connection-status { margin-top: 12px; padding: 12px; border-radius: 8px; font-weight: 600; text-align: center; background: rgba(255,255,255,0.12); }
+                        .connection-status.info { border-left: 4px solid #1976d2; }
+                        .connection-status.error { border-left: 4px solid #d32f2f; background: rgba(211,47,47,0.28); }
+                        @media (max-width: 520px) {
+                            .input-row { flex-direction: column; }
+                            .input-row button { width: 100%; }
+                        }
                     </style>
                 </head>
                 <body>
                 <div class="container">
                     <h1>Der Große Preis</h1>
                     <div id="identityBanner" class="identity-banner hidden"></div>
+                    <div class="card connection-card" id="connectionCard">
+                        <h2>Verbindung</h2>
+                        <div id="serverDescription" class="info-text">Bitte die Adresse des Spielleiters eingeben (z.B. http://192.168.0.10:8080).</div>
+                        <div class="input-row">
+                            <input type="text" id="serverInput" placeholder="http://192.168.0.10:8080"/>
+                            <button id="confirmServerBtn">Server speichern</button>
+                        </div>
+                        <div id="connectionStatus" class="connection-status hidden"></div>
+                    </div>
                     <div class="card identity-card" id="identityCard">
                         <h2>Spieler anmelden</h2>
                         <div id="identitySetup">
@@ -434,6 +589,14 @@ public class PlayerServer implements AutoCloseable {
                         team: localStorage.getItem('dgpPlayerTeam') || ''
                     };
 
+                    const serverState = {
+                        base: '',
+                        lastError: ''
+                    };
+
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const serverFromQuery = urlParams.get('server');
+
                     const elements = {
                         identityBanner: document.getElementById('identityBanner'),
                         playerNameInput: document.getElementById('playerNameInput'),
@@ -447,7 +610,11 @@ public class PlayerServer implements AutoCloseable {
                         activeTeam: document.getElementById('activeTeam'),
                         answers: document.getElementById('answers'),
                         scoreboard: document.getElementById('scoreboard'),
-                        message: document.getElementById('message')
+                        message: document.getElementById('message'),
+                        serverDescription: document.getElementById('serverDescription'),
+                        serverInput: document.getElementById('serverInput'),
+                        confirmServerBtn: document.getElementById('confirmServerBtn'),
+                        connectionStatus: document.getElementById('connectionStatus')
                     };
 
                     elements.confirmNameBtn.addEventListener('click', () => {
@@ -480,6 +647,100 @@ public class PlayerServer implements AutoCloseable {
                         localStorage.setItem('dgpPlayerTeam', identity.team);
                         applyIdentityUI();
                     });
+
+                    elements.confirmServerBtn.addEventListener('click', () => {
+                        storeServerFromInput();
+                    });
+
+                    elements.serverInput.addEventListener('keydown', event => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            storeServerFromInput();
+                        }
+                    });
+
+                    function storeServerFromInput() {
+                        if (setServerBase(elements.serverInput.value, true)) {
+                            fetchState();
+                        }
+                    }
+
+                    function normalizeServerBase(value) {
+                        if (!value) {
+                            return '';
+                        }
+                        let normalized = value.trim();
+                        if (!normalized) {
+                            return '';
+                        }
+                        if (!/^https?:\\/\\//i.test(normalized)) {
+                            normalized = 'http://' + normalized;
+                        }
+                        return normalized.replace(/\\/+$/, '');
+                    }
+
+                    function clearServerBase() {
+                        serverState.base = '';
+                        serverState.lastError = '';
+                        localStorage.removeItem('dgpServerBase');
+                        applyServerUI();
+                        showConnectionStatus('Bitte die Adresse des Spielleiters eintragen (z.B. http://192.168.0.10:8080).', 'error');
+                    }
+
+                    function setServerBase(value, persist) {
+                        const normalized = normalizeServerBase(value);
+                        if (!normalized) {
+                            clearServerBase();
+                            return false;
+                        }
+                        serverState.base = normalized;
+                        if (persist) {
+                            localStorage.setItem('dgpServerBase', serverState.base);
+                        }
+                        applyServerUI();
+                        showConnectionStatus('Verbinde zu ' + serverState.base + ' …', 'info');
+                        return true;
+                    }
+
+                    function loadInitialServerBase() {
+                        if (serverFromQuery && setServerBase(serverFromQuery, true)) {
+                            return;
+                        }
+                        const stored = localStorage.getItem('dgpServerBase');
+                        if (stored && setServerBase(stored, false)) {
+                            return;
+                        }
+                        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                            setServerBase(location.origin, false);
+                            return;
+                        }
+                        clearServerBase();
+                    }
+
+                    function applyServerUI() {
+                        if (serverState.base) {
+                            elements.serverDescription.textContent = 'Verbunden mit: ' + serverState.base;
+                        } else {
+                            elements.serverDescription.textContent = 'Bitte die Adresse des Spielleiters eingeben (z.B. http://192.168.0.10:8080).';
+                        }
+                        elements.serverInput.value = serverState.base;
+                    }
+
+                    function showConnectionStatus(message, type) {
+                        elements.connectionStatus.classList.toggle('hidden', !message);
+                        elements.connectionStatus.classList.remove('error', 'info');
+                        if (!message) {
+                            elements.connectionStatus.textContent = '';
+                            return;
+                        }
+                        const variant = type === 'error' ? 'error' : 'info';
+                        elements.connectionStatus.classList.add(variant);
+                        elements.connectionStatus.textContent = message;
+                    }
+
+                    function apiUrl(path) {
+                        return serverState.base + path;
+                    }
 
                     function applyIdentityUI() {
                         const hasName = !!identity.name;
@@ -531,13 +792,25 @@ public class PlayerServer implements AutoCloseable {
                     }
 
                     async function fetchState() {
+                        if (!serverState.base) {
+                            return;
+                        }
                         try {
-                            const response = await fetch('/api/state');
-                            if (!response.ok) return;
+                            const response = await fetch(apiUrl('/api/state'), { mode: 'cors' });
+                            if (!response.ok) {
+                                throw new Error('HTTP ' + response.status);
+                            }
                             const data = await response.json();
                             renderState(data);
+                            serverState.lastError = '';
+                            showConnectionStatus('', '');
                         } catch (e) {
-                            console.error('Fehler beim Laden des Spielstands', e);
+                            const errorMessage = 'Keine Verbindung zu ' + serverState.base;
+                            if (serverState.lastError !== errorMessage) {
+                                console.error(errorMessage, e);
+                                serverState.lastError = errorMessage;
+                            }
+                            showConnectionStatus(errorMessage, 'error');
                         }
                     }
 
@@ -615,18 +888,34 @@ public class PlayerServer implements AutoCloseable {
                             alert('Bitte zuerst ein Team festlegen.');
                             return;
                         }
+                        if (!serverState.base) {
+                            alert('Keine Serveradresse gespeichert.');
+                            return;
+                        }
                         const formData = new URLSearchParams();
                         formData.append('team', identity.team);
                         formData.append('player', identity.name);
                         formData.append('answer', String(answerIndex));
                         try {
-                            const response = await fetch('/api/answer', {
+                            const response = await fetch(apiUrl('/api/answer'), {
                                 method: 'POST',
+                                mode: 'cors',
                                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                                 body: formData.toString()
                             });
-                            const data = await response.json();
-                            alert(data.message);
+                            let data = null;
+                            try {
+                                data = await response.json();
+                            } catch (_) {
+                                // ignore JSON parse error
+                            }
+                            if (data && data.message) {
+                                alert(data.message);
+                            } else if (!response.ok) {
+                                alert('Fehler beim Senden der Antwort.');
+                            } else {
+                                alert('Antwort gesendet.');
+                            }
                         } catch (e) {
                             alert('Fehler beim Senden der Antwort.');
                         } finally {
@@ -638,7 +927,7 @@ public class PlayerServer implements AutoCloseable {
                         if (!value) {
                             return '';
                         }
-                        return value.replace(/[&<>"']/g, function(match) {
+                        return value.replace(/[&<>"']/g, match => {
                             switch (match) {
                                 case '&': return '&amp;';
                                 case '<': return '&lt;';
@@ -650,8 +939,12 @@ public class PlayerServer implements AutoCloseable {
                         });
                     }
 
+                    loadInitialServerBase();
                     applyIdentityUI();
-                    fetchState();
+                    applyServerUI();
+                    if (serverState.base) {
+                        fetchState();
+                    }
                     setInterval(fetchState, 1500);
                 </script>
                 </body>
